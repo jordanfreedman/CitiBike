@@ -11,7 +11,7 @@ con = lite.connect('citi_bike.db')
 cur = con.cursor()
 
 
-# create table for static info 
+# create table for static location info 
 cur.execute('DROP TABLE citibike_reference')
 
 
@@ -25,10 +25,5 @@ for station in r.json()['stationBeanList']:
 	cur.execute(sql, (station['id'], station['totalDocks'], station['city'], station['altitude'], station['stAddress2'], station['longitude'], station['postalCode'], station['testStation'], station['stAddress1'], station['stationName'], station['landMark'], station['latitude'], station['location']))
 con.commit()
 
-cur.execute('SELECT * FROM citibike_reference')
-rows = cur.fetchall()
-cols = [desc[0] for desc in cur.description]
-df = pd.DataFrame(rows, columns=cols)
-
-print df
+con.close()
 

@@ -8,32 +8,37 @@ import numpy as np
 con = lite.connect('citi_bike.db')
 cur = con.cursor()
 
-# read into pandas dataframe
+# store data regarding available bikes difference per minute (per station) in a dataframe
 cur.execute("SELECT * FROM available_bikes")
-
 rows = cur.fetchall()
 cols = [desc[0] for desc in cur.description]
 bike_data = pd.DataFrame(rows, columns=cols)
 
-cur.execute("SELECT id, longitude,latitude FROM citibike_reference")
 
+# store location data for each station in a dataframe
+cur.execute("SELECT id, longitude,latitude FROM citibike_reference")
 rows = cur.fetchall()
 cols = [desc[0] for desc in cur.description]
 positions = pd.DataFrame(rows, columns=cols)
 
+# create list with station id's
 id_col = bike_data.columns.values[1:]
 
 cur.execute('DROP TABLE torque')
 
+# create sql table to store values
 cur.execute("CREATE TABLE torque (id INT, difference INT, execution_time INT);")
 
+# calculate total difference per station for each 30 minute interval from 0:00 to 23:30
 for hour in range(24):
 	for q in [0, 30]:
-			
+		
+		# set interval and limit table to times within interval	
 		beginning = int((datetime.datetime(2015,8,9,hour,q,0)).strftime('%s'))
 		end = int((datetime.datetime(2015,8,9,hour,(q+29), 59)).strftime('%s'))
 		activity = bike_data[(bike_data['execution_time'] > beginning) & (bike_data['execution_time'] <= end)]
 				
+		# categorise difference values 	
 		for i in id_col:
 				
 			if (sum(activity[i]) > 0) & (sum(activity[i]) <= 5):
@@ -54,20 +59,17 @@ for hour in range(24):
 
 con.commit()
 
+# store data in a dataframe
 cur.execute("SELECT * FROM torque")
-
 rows = cur.fetchall()
 cols = [desc[0] for desc in cur.description]
 data = pd.DataFrame(rows, columns=cols)
 
 
-
+# add location (long, lat) to dataframe
 result = pd.merge(data, positions, how='left', on='id')
 
-
-
-print result
-
+# store data in csv ready for visualisation
 result.to_csv('bicycle_data.csv', sep='\t')
 
 
