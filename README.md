@@ -1,5 +1,5 @@
 # What is this?
-Grabbing a bike in NYC, well here's the hotspots. Contained in the repository is a group of files which will follow the steps from munging, to analysis and finally to visualise.
+Grabbing a bike in NYC? Well here's the hotspots. Contained in the repository is a group of files which will follow the steps from munging, to analysis and finally to visualise.
 Check out the final visualisation here: http://cdb.io/1ht97pX
 
 http://cdb.io/1ht97pX
